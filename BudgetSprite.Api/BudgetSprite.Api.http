@@ -1,0 +1,6 @@
+@BudgetSprite.Api_HostAddress = http://localhost:5027
+
+GET {{BudgetSprite.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
