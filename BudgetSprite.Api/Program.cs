@@ -89,6 +89,9 @@ builder.Services.AddSwaggerGen(c =>
 // Recurring bill background service
 builder.Services.AddHostedService<RecurringBillService>();
 
+// MemoryCache for stats
+builder.Services.AddMemoryCache();
+
 // Static files (uploads)
 builder.Services.AddDirectoryBrowser();
 

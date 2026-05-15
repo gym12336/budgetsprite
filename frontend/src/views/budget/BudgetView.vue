@@ -45,18 +45,24 @@ onMounted(fetchBudgets)
     </div>
     <el-card shadow="never" v-loading="loading">
       <el-empty v-if="!budgets.length" description="本月暂无预算" />
-      <div v-for="b in budgets" :key="b.id" class="budget-item">
+      <div
+        v-for="b in budgets" :key="b.id" class="budget-item"
+        :class="{ 'over-budget': b.remaining < 0, 'warn-budget': b.remaining >= 0 && b.used / b.amount >= 0.8 }"
+      >
         <div class="budget-header">
           <span class="budget-name">{{ b.categoryName || '总预算' }}</span>
-          <span class="budget-amount">{{ b.used?.toFixed(2) }} / {{ b.amount?.toFixed(2) }} 元</span>
+          <el-tag v-if="b.remaining < 0" type="danger" size="small" style="margin-right:8px">⚠️ 超支 ¥{{ Math.abs(b.remaining).toFixed(0) }}</el-tag>
+          <el-tag v-else-if="b.used / b.amount >= 0.8" type="warning" size="small" style="margin-right:8px">注意：已用 {{ Math.round(b.used/b.amount*100) }}%</el-tag>
+          <span class="budget-amount">{{ Number(b.used).toFixed(2) }} / {{ Number(b.amount).toFixed(2) }} 元</span>
           <el-button link type="danger" size="small" @click="handleDelete(b.id)">删除</el-button>
         </div>
         <el-progress
           :percentage="Math.min(100, Math.round((b.used / b.amount) * 100))"
-          :status="b.used >= b.amount ? 'exception' : b.used / b.amount >= 0.8 ? 'warning' : 'success'"
+          :status="b.remaining < 0 ? 'exception' : b.used / b.amount >= 0.8 ? 'warning' : 'success'"
+          :stroke-width="10"
         />
-        <div style="margin-top:6px;font-size:13px" :style="{color: b.remaining>=0?'#67c23a':'#f56c6c'}">
-          剩余：¥{{ b.remaining?.toFixed(2) }}
+        <div style="margin-top:6px;font-size:13px" :style="{color: b.remaining>=0?'#67c23a':'#f56c6c', fontWeight: b.remaining<0?'700':'400'}">
+          {{ b.remaining >= 0 ? `剩余：¥${Number(b.remaining).toFixed(2)}` : `超支：¥${Math.abs(b.remaining).toFixed(2)}` }}
         </div>
       </div>
     </el-card>
@@ -78,8 +84,10 @@ onMounted(fetchBudgets)
 </template>
 
 <style scoped>
-.budget-item { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #f0f0f0; }
+.budget-item { margin-bottom:20px; padding:16px; border-bottom:1px solid #f0f0f0; border-radius:8px; transition: border 0.2s; }
 .budget-item:last-child { border-bottom:none; }
+.budget-item.over-budget { border:1px solid #f56c6c; background:#fff5f5; }
+.budget-item.warn-budget { border:1px solid #e6a23c; background:#fffbf0; }
 .budget-header { display:flex; align-items:center; margin-bottom:8px; }
 .budget-name { font-weight:600; flex:1; }
 .budget-amount { font-size:13px; color:#888; margin-right:12px; }

@@ -49,14 +49,21 @@ onMounted(async () => {
       <!-- 预算进度 -->
       <el-col :span="12">
         <el-card shadow="never" header="预算进度">
+          <div v-if="data.budgets?.some((b:any) => b.remaining < 0)" style="margin-bottom:10px">
+            <el-tag type="danger">⚠️ 有 {{ data.budgets.filter((b:any) => b.remaining < 0).length }} 项预算超支</el-tag>
+          </div>
           <div v-for="b in data.budgets" :key="b.id" class="budget-row">
-            <span>{{ b.categoryName || '总预算' }}</span>
+            <span :style="{color: b.remaining < 0 ? '#f56c6c' : b.used/b.amount >= 0.8 ? '#e6a23c' : '', fontWeight: b.remaining < 0 ? '700' : '400'}">
+              {{ b.categoryName || '总预算' }}
+            </span>
             <el-progress
               :percentage="Math.min(100, Math.round((b.used / b.amount) * 100))"
-              :status="b.used >= b.amount ? 'exception' : b.used / b.amount >= 0.8 ? 'warning' : ''"
+              :status="b.remaining < 0 ? 'exception' : b.used / b.amount >= 0.8 ? 'warning' : ''"
               style="flex:1;margin:0 12px"
             />
-            <span class="budget-text">{{ b.used?.toFixed(0) }} / {{ b.amount?.toFixed(0) }}</span>
+            <span class="budget-text" :style="{color: b.remaining < 0 ? '#f56c6c' : '#888'}">
+              {{ Number(b.used).toFixed(0) }} / {{ Number(b.amount).toFixed(0) }}
+            </span>
           </div>
           <el-empty v-if="!data.budgets?.length" description="暂无预算" />
         </el-card>

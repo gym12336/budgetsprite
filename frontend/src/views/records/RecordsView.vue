@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { recordsApi } from '@/api/records'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -93,6 +93,33 @@ async function handleImport(file: File) {
 }
 
 onMounted(fetchRecords)
+
+// 按日期分组
+const groupedRecords = computed(() => {
+  const groups: { label: string; items: any[]; expense: number; income: number }[] = []
+  const map = new Map<string, typeof groups[0]>()
+  const today = new Date()
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1)
+
+  for (const r of records.value) {
+    const d = new Date(r.occurredAt)
+    let label: string
+    if (d.toDateString() === today.toDateString()) label = '今天'
+    else if (d.toDateString() === yesterday.toDateString()) label = '昨天'
+    else label = d.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })
+
+    if (!map.has(label)) {
+      const g = { label, items: [], expense: 0, income: 0 }
+      map.set(label, g)
+      groups.push(g)
+    }
+    const g = map.get(label)!
+    g.items.push(r)
+    if (r.type === 0) g.expense += Number(r.amount)
+    if (r.type === 1) g.income += Number(r.amount)
+  }
+  return groups
+})
 </script>
 
 <template>
@@ -139,20 +166,29 @@ onMounted(fetchRecords)
     <el-card shadow="never" v-loading="loading">
       <el-empty v-if="!records.length" description="暂无账单记录" />
       <template v-else>
-        <div v-for="r in records" :key="r.id" class="record-item">
-          <div class="record-left">
-            <span class="category-tag" :style="{ background: r.categoryColor || '#409eff' }">
-              {{ r.categoryIcon }} {{ r.categoryName }}
+        <div v-for="group in groupedRecords" :key="group.label">
+          <!-- 日期分组标题 -->
+          <div class="date-group-header">
+            <span class="date-label">{{ group.label }}</span>
+            <span class="date-summary">
+              <span v-if="group.income > 0" class="amount-income">+¥{{ group.income.toFixed(2) }}</span>
+              <span v-if="group.expense > 0" class="amount-expense" style="margin-left:8px">-¥{{ group.expense.toFixed(2) }}</span>
             </span>
-            <span class="record-note">{{ r.note || r.tags || '-' }}</span>
-            <span class="record-date">{{ new Date(r.occurredAt).toLocaleDateString('zh-CN') }}</span>
           </div>
-          <div class="record-right">
-            <span :class="r.type === 1 ? 'amount-income' : 'amount-expense'">
-              {{ r.type === 1 ? '+' : '-' }}¥{{ r.amount?.toFixed(2) }}
-            </span>
-            <el-button link size="small" @click="router.push(`/records/${r.id}/edit`)">编辑</el-button>
-            <el-button link size="small" type="danger" @click="handleDelete(r.id)">删除</el-button>
+          <div v-for="r in group.items" :key="r.id" class="record-item">
+            <div class="record-left">
+              <span class="category-tag" :style="{ background: r.categoryColor || '#409eff' }">
+                {{ r.categoryIcon }} {{ r.categoryName }}
+              </span>
+              <span class="record-note">{{ r.note || r.tags || '-' }}</span>
+            </div>
+            <div class="record-right">
+              <span :class="r.type === 1 ? 'amount-income' : 'amount-expense'">
+                {{ r.type === 1 ? '+' : '-' }}¥{{ Number(r.amount).toFixed(2) }}
+              </span>
+              <el-button link size="small" @click="router.push(`/records/${r.id}/edit`)">编辑</el-button>
+              <el-button link size="small" type="danger" @click="handleDelete(r.id)">删除</el-button>
+            </div>
           </div>
         </div>
         <el-pagination
@@ -210,12 +246,15 @@ onMounted(fetchRecords)
 </template>
 
 <style scoped>
-.record-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f0f0; }
+.date-group-header { display:flex; justify-content:space-between; align-items:center; padding:10px 0 6px; border-bottom:2px solid #f0f0f0; margin-top:8px; }
+.date-group-header:first-child { margin-top:0; }
+.date-label { font-size:13px; font-weight:600; color:#333; }
+.date-summary { font-size:12px; }
+.record-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f8f8f8; }
 .record-item:last-child { border-bottom:none; }
 .record-left { display:flex; align-items:center; gap:12px; }
-.category-tag { padding:2px 8px; border-radius:12px; font-size:12px; color:#fff; }
+.category-tag { padding:2px 8px; border-radius:12px; font-size:12px; color:#fff; white-space:nowrap; }
 .record-note { font-size:13px; color:#666; }
-.record-date { font-size:12px; color:#aaa; }
 .record-right { display:flex; align-items:center; gap:8px; }
 .amount-income { color:#67c23a; font-weight:700; font-size:15px; }
 .amount-expense { color:#f56c6c; font-weight:700; font-size:15px; }

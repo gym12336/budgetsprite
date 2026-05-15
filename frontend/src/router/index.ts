@@ -15,6 +15,7 @@ const router = createRouter({
         { path: 'records', name: 'records', component: () => import('@/views/records/RecordsView.vue') },
         { path: 'records/add', name: 'records-add', component: () => import('@/views/records/RecordFormView.vue') },
         { path: 'records/:id/edit', name: 'records-edit', component: () => import('@/views/records/RecordFormView.vue') },
+        { path: 'records/recurring', name: 'records-recurring', component: () => import('@/views/records/RecurringView.vue') },
         { path: 'budget', name: 'budget', component: () => import('@/views/budget/BudgetView.vue') },
         { path: 'stats/month', name: 'stats-month', component: () => import('@/views/stats/MonthStatsView.vue') },
         { path: 'stats/year', name: 'stats-year', component: () => import('@/views/stats/YearStatsView.vue') },

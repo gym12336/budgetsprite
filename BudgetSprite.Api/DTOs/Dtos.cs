@@ -92,6 +92,14 @@ public record YearStatsResponse(
 
 public record MonthlyStatItem(string YearMonth, decimal Income, decimal Expense);
 
+// ---- User profile ----
+public record UpdateProfileRequest(string? Nickname, string? AvatarUrl);
+public record ChangePasswordRequest(string OldPassword, string NewPassword);
+
+// ---- Recurring ----
+public record RecurringRuleDto(int Id, int CategoryId, string CategoryName, int AccountId, string AccountName, decimal Amount, string? Note, int DayOfMonth, bool IsActive);
+public record RecurringRuleRequest(int CategoryId, int AccountId, decimal Amount, string? Note, int DayOfMonth);
+
 // ---- Dashboard ----
 public record DashboardResponse(
     decimal MonthIncome,

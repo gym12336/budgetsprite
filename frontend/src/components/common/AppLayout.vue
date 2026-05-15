@@ -9,6 +9,7 @@ const auth = useAuthStore()
 const menuItems = [
   { path: '/dashboard', icon: 'Odometer', label: '仪表盘' },
   { path: '/records', icon: 'List', label: '账单' },
+  { path: '/records/recurring', icon: 'Timer', label: '周期账单' },
   { path: '/budget', icon: 'TrendCharts', label: '预算' },
   { path: '/stats/month', icon: 'PieChart', label: '月度统计' },
   { path: '/stats/year', icon: 'DataLine', label: '年度统计' },

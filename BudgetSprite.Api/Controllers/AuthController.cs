@@ -76,6 +76,37 @@ public class AuthController(AppDbContext db, IConfiguration config) : Controller
         return Ok(new UserDto(user.Id, user.Username, user.Nickname, user.AvatarUrl));
     }
 
+    [Authorize]
+    [HttpPatch("profile")]
+    public async Task<IActionResult> UpdateProfile(UpdateProfileRequest req)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await db.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        if (req.Nickname != null) user.Nickname = req.Nickname;
+        if (req.AvatarUrl != null) user.AvatarUrl = req.AvatarUrl;
+        await db.SaveChangesAsync();
+
+        return Ok(new UserDto(user.Id, user.Username, user.Nickname, user.AvatarUrl));
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest req)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await db.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        if (!BCrypt.Net.BCrypt.Verify(req.OldPassword, user.PasswordHash))
+            return BadRequest(new { message = "当前密码不正确" });
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
+        await db.SaveChangesAsync();
+        return Ok(new { message = "密码修改成功" });
+    }
+
     private string GenerateAccessToken(User user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
