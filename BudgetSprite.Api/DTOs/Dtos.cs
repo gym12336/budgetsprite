@@ -100,6 +100,10 @@ public record ChangePasswordRequest(string OldPassword, string NewPassword);
 public record RecurringRuleDto(int Id, int CategoryId, string CategoryName, int AccountId, string AccountName, decimal Amount, string? Note, int DayOfMonth, bool IsActive);
 public record RecurringRuleRequest(int CategoryId, int AccountId, decimal Amount, string? Note, int DayOfMonth);
 
+// ---- AI Analysis ----
+public record AiAnalysisResponse(string Summary, List<AiInsight> Insights);
+public record AiInsight(string Type, string Icon, string Title, string Content, string Level);
+
 // ---- Dashboard ----
 public record DashboardResponse(
     decimal MonthIncome,

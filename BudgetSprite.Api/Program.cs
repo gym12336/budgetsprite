@@ -92,6 +92,9 @@ builder.Services.AddHostedService<RecurringBillService>();
 // MemoryCache for stats
 builder.Services.AddMemoryCache();
 
+// HttpClient for DeepSeek AI
+builder.Services.AddHttpClient();
+
 // Static files (uploads)
 builder.Services.AddDirectoryBrowser();
 

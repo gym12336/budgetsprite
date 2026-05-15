@@ -13,6 +13,7 @@ const menuItems = [
   { path: '/budget', icon: 'TrendCharts', label: '预算' },
   { path: '/stats/month', icon: 'PieChart', label: '月度统计' },
   { path: '/stats/year', icon: 'DataLine', label: '年度统计' },
+  { path: '/ai/analysis', icon: 'MagicStick', label: 'AI 分析' },
   { path: '/accounts', icon: 'CreditCard', label: '账户' },
   { path: '/category', icon: 'Grid', label: '分类' },
   { path: '/settings', icon: 'Setting', label: '设置' },

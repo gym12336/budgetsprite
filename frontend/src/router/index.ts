@@ -22,6 +22,7 @@ const router = createRouter({
         { path: 'accounts', name: 'accounts', component: () => import('@/views/accounts/AccountsView.vue') },
         { path: 'category', name: 'category', component: () => import('@/views/category/CategoryView.vue') },
         { path: 'settings', name: 'settings', component: () => import('@/views/settings/SettingsView.vue') },
+        { path: 'ai/analysis', name: 'ai-analysis', component: () => import('@/views/ai/AiAnalysisView.vue') },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
