@@ -2,6 +2,7 @@ using System.Text;
 using BudgetSprite.Api.Data;
 using BudgetSprite.Api.Middleware;
 using BudgetSprite.Api.Repositories;
+using BudgetSprite.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -84,6 +85,9 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+// Recurring bill background service
+builder.Services.AddHostedService<RecurringBillService>();
 
 // Static files (uploads)
 builder.Services.AddDirectoryBrowser();
