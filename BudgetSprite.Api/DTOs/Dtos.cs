@@ -103,6 +103,8 @@ public record RecurringRuleRequest(int CategoryId, int AccountId, decimal Amount
 // ---- AI Analysis ----
 public record AiAnalysisResponse(string Summary, List<AiInsight> Insights);
 public record AiInsight(string Type, string Icon, string Title, string Content, string Level);
+public record ParseRecordRequest(string Text);
+public record ParseRecordResult(byte? Type, decimal? Amount, string? CategoryHint, string? Note, string? DateHint, bool Success, string? ErrorMessage);
 
 // ---- Dashboard ----
 public record DashboardResponse(
